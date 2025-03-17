@@ -1,5 +1,6 @@
 package twizzies;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -20,9 +21,10 @@ public class Button {
     public Button(Frame f, String nom, JPanel pannel, String fichierImage, int x, int y, int width, int height) {
         this.fichierImage = fichierImage;
         JButton bouton = new JButton(nom);
+        bouton.setBackground(Color.pink);
         bouton.setBounds(x, y, width, height);
         pannel.add(bouton);
-
+        pannel.setBackground(new Color(230, 223, 204));
         bouton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // inserer ici le traitement d'image
@@ -38,7 +40,8 @@ public class Button {
         try {
             // création d'un Jpanel pour placer l'image
             JPanel panel = new JPanel();
-            panel.setBounds(50, 50, 100, 100);
+            panel.setBackground(new Color(230, 223, 204));
+            panel.setBounds(70, 70, 100, 100);
             BufferedImage img = ImageIO.read(new File(fichierImage));
             JLabel pic = new JLabel(new ImageIcon(img));
             panel.add(pic);
