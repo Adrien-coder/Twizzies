@@ -37,23 +37,22 @@ import org.opencv.imgproc.Imgproc;
 public class Main {
 	public static void main(String[] args) {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-		 //showCMD(readImage("opencv.png"));
+		// showCMD(readImage("opencv.png"));
 		
-		 //showColorChannels(separateColorsChannelsrGrayscale(readImage("bgr.png")));
-		 //showColorChannels(separateColorsChannelsrRGB(readImage("bgr.png")));
+		// showColorChannels(separateColorsChannelsrGrayscale(readImage("bgr.png")));
+		// showColorChannels(separateColorsChannelsrRGB(readImage("bgr.png")));
 		
-		 //showColorChannels(transposeToHSV(readImage("hsv.png")));
+		// showColorChannels(transposeToHSV(readImage("hsv.png")));
 		
-		// showImage("Smoothed Thresheld Image",thresholding(readImage("circles.jpg"),0,10));
+		// showImage("Smoothed Thresheld Image",thresholding(readImage("circles.jpg"),160,180));
+		// showImage("Smoothed Multi-Thresheld Image", thresholdingMultipleColors(readImage("circles.jpg"),0,10,160,180));
 		
-		// seuillage rouge (avec lissage) complet
-		// seuillageRouge("circles.jpg");
+		// showImage("Extracted Contours", extractContours(thresholdingMultipleColors(readImage("circles.jpg"),0,10,160,180)));
 		
-		//extraireContourRouge("circles.jpg");
-		//extraireCercleRouge("circles_rectangles.jpg");
-		//extraireCercleRouge("Billard_Balls.jpg");
-		matching("Stanislas.jpg");
-		
+		// showImage("Surrounded Circles", surroundCircles(readImage("circles_rectangles.jpg"),0,10,160,180));
+		// showImage("Surrounded Circles", surroundCircles(readImage("Billard_Balls.jpg"),0,10,160,180));
+
+		matching("Billard_Balls.jpg");
 	}
 
 	public static Mat readImage(String fichier) {
@@ -175,40 +174,21 @@ public class Main {
 		return threshold_img;
 	}
 
-	// -------------------------------------------------------------------------
-	/*public static void seuillageRouge(String fichier) {
-		Mat m = readImage(fichier);
-		Mat hsv_image = Mat.zeros(m.size(), m.type());
-		Imgproc.cvtColor(m, hsv_image, Imgproc.COLOR_BGR2HSV);
+	public static Mat thresholdingMultipleColors(Mat img, int lower_bound1, int higher_bound1, int lower_bound2, int higher_bound2) {
+		Mat hsv_image = Mat.zeros(img.size(), img.type());
+		Imgproc.cvtColor(img, hsv_image, Imgproc.COLOR_BGR2HSV);
 		Mat threshold_img = new Mat();
 		Mat threshold_img1 = new Mat();
 		Mat threshold_img2 = new Mat();
-		Core.inRange(hsv_image, new Scalar(0, 100, 100), new Scalar(10, 255, 255), threshold_img1);
-		Core.inRange(hsv_image, new Scalar(160, 100, 100), new Scalar(179, 255, 255), threshold_img2);
+		Core.inRange(hsv_image, new Scalar(lower_bound1, 100, 100), new Scalar(higher_bound1, 255, 255), threshold_img1);
+		Core.inRange(hsv_image, new Scalar(lower_bound2, 100, 100), new Scalar(higher_bound2, 255, 255), threshold_img2);
 		Core.bitwise_or(threshold_img1, threshold_img2, threshold_img);
+		// Smoothing
 		Imgproc.GaussianBlur(threshold_img, threshold_img, new Size(9, 9), 2, 2);
-		showImage("CercleRouge", threshold_img);
-	}
-
-	public static Mat DetecterCercles(Mat hsv_image) {
-
-		Mat threshold_img = new Mat();
-		Mat threshold_img1 = new Mat();
-		Mat threshold_img2 = new Mat();
-		Core.inRange(hsv_image, new Scalar(0, 100, 100), new Scalar(10, 255, 255), threshold_img1);
-		Core.inRange(hsv_image, new Scalar(160, 100, 100), new Scalar(179, 255, 255), threshold_img2);
-		Core.bitwise_or(threshold_img1, threshold_img2, threshold_img);
-		Imgproc.GaussianBlur(threshold_img, threshold_img, new Size(9, 9), 2, 2);
-		// ImShow("CercleRouge",threshold_img);
 		return threshold_img;
-
 	}
 
-	public static void extraireContourRouge(String fichier) {
-		Mat m = readImage(fichier);
-		Mat hsv_image = Mat.zeros(m.size(), m.type());
-		Imgproc.cvtColor(m, hsv_image, Imgproc.COLOR_BGR2HSV);
-		Mat threshold_img = DetecterCercles(hsv_image);
+	public static Mat extractContours(Mat threshold_img) {
 		int thresh = 100;
 		Mat canny_output = new Mat();
 		List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
@@ -221,10 +201,10 @@ public class Main {
 			Scalar color = new Scalar(rand.nextInt(255 - 0 + 1), rand.nextInt(255 - 0 + 1), rand.nextInt(255 - 0 + 1));
 			Imgproc.drawContours(drawing, contours, i, color, 1, 8, hierarchy, 0, new Point());
 		}
-		showImage("Contours", drawing);
+		return drawing;
 	}
-
-	public static List<MatOfPoint> DetecterContours(Mat threshold_img) {
+	
+	public static List<MatOfPoint> extractContoursPoints(Mat threshold_img) {
 		int thresh = 100;
 		Mat canny_output = new Mat();
 		List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
@@ -240,13 +220,10 @@ public class Main {
 		return contours;
 	}
 
-	public static void extraireCercleRouge(String fichier) {
-		Mat m = readImage(fichier);
-		Mat hsv_image = Mat.zeros(m.size(), m.type());
-		Imgproc.cvtColor(m, hsv_image, Imgproc.COLOR_BGR2HSV);
-		Mat threshold_img = DetecterCercles(hsv_image);
+	public static Mat surroundCircles(Mat img, int lower_bound1, int higher_bound1, int lower_bound2, int higher_bound2) {
+		Mat threshold_img = thresholdingMultipleColors(img,lower_bound1,higher_bound1,lower_bound2,higher_bound2);
 
-		List<MatOfPoint> contours = DetecterContours(threshold_img);
+		List<MatOfPoint> contours = extractContoursPoints(threshold_img);
 		MatOfPoint2f matOfPoint2f = new MatOfPoint2f();
 
 		float[] radius = new float[1];
@@ -257,69 +234,109 @@ public class Main {
 			matOfPoint2f.fromList(contour.toList());
 			Imgproc.minEnclosingCircle(matOfPoint2f, center, radius);
 			if ((contourArea / (Math.PI * radius[0] * radius[0])) >= 0.8) {
-				Core.circle(m, center, (int) radius[0], new Scalar(0, 255, 0), 2);
+				Core.circle(img, center, (int) radius[0], new Scalar(0, 255, 0), 2);
 			}
-			showImage("Dettection cercles rouges", m);
 		}
+		return img;
 	}
-*/
-	  public static void matching(String fichier) {
-	        // Chargement de l'image cible (panneau routier)
-	        Mat sroadSign = Highgui.imread(fichier);
-	        if (sroadSign.empty()) {
-	            System.out.println("Erreur : image non chargée !");
-	            return;
-	        }
+	
+	// version 2.0
+	public static void matching(String fichier) {
+        // Chargement de l'image cible (panneau routier)
+        Mat sroadSign = Highgui.imread(fichier);
+        if (sroadSign.empty()) {
+            System.out.println("Erreur : image non chargée !");
+            return;
+        }
 
-	        // Exemple : objet à détecter, ici chargé depuis un autre fichier
-	        String objectfile = "StanislasFace.jpg";
-	        Mat object = Highgui.imread(objectfile);
-	        if (object.empty()) {
-	            System.out.println("Erreur : image objet non chargée !");
-	            return;
-	        }
+        // Exemple : objet à détecter, ici chargé depuis un autre fichier
+        String objectfile = "Ball_three.png";
+        Mat object = Highgui.imread(objectfile);
+        if (object.empty()) {
+            System.out.println("Erreur : image objet non chargée !");
+            return;
+        }
 
-	        // Mise à l'échelle
-	        Mat sObject = new Mat();
-	        Imgproc.resize(object, sObject, sroadSign.size());
+        // Mise à l'échelle
+        Mat sObject = new Mat();
+        Imgproc.resize(object, sObject, sroadSign.size());
 
-	        // Conversion en niveaux de gris et normalisation
-	        Mat grayObject = new Mat();
-	        Imgproc.cvtColor(sObject, grayObject, Imgproc.COLOR_BGR2GRAY);
-	        Core.normalize(grayObject, grayObject, 0, 255, Core.NORM_MINMAX);
+        // Conversion en niveaux de gris et normalisation
+        Mat grayObject = new Mat();
+        Imgproc.cvtColor(sObject, grayObject, Imgproc.COLOR_BGR2GRAY);
+        Core.normalize(grayObject, grayObject, 0, 255, Core.NORM_MINMAX);
 
-	        Mat graySign = new Mat();
-	        Imgproc.cvtColor(sroadSign, graySign, Imgproc.COLOR_BGR2GRAY);
-	        Core.normalize(graySign, graySign, 0, 255, Core.NORM_MINMAX);
+        Mat graySign = new Mat();
+        Imgproc.cvtColor(sroadSign, graySign, Imgproc.COLOR_BGR2GRAY);
+        Core.normalize(graySign, graySign, 0, 255, Core.NORM_MINMAX);
 
-	        // Détection de points clés (keypoints) et extraction descripteurs ORB
-	        FeatureDetector orbDetector = FeatureDetector.create(FeatureDetector.ORB);
-	        DescriptorExtractor orbExtractor = DescriptorExtractor.create(DescriptorExtractor.ORB);
+        // Détection de points clés (keypoints) et extraction descripteurs ORB
+        FeatureDetector orbDetector = FeatureDetector.create(FeatureDetector.ORB);
+        DescriptorExtractor orbExtractor = DescriptorExtractor.create(DescriptorExtractor.ORB);
 
-	        MatOfKeyPoint objectKeypoints = new MatOfKeyPoint();
-	        MatOfKeyPoint signKeypoints = new MatOfKeyPoint();
-	        orbDetector.detect(grayObject, objectKeypoints);
-	        orbDetector.detect(graySign, signKeypoints);
+        MatOfKeyPoint objectKeypoints = new MatOfKeyPoint();
+        MatOfKeyPoint signKeypoints = new MatOfKeyPoint();
+        orbDetector.detect(grayObject, objectKeypoints);
+        orbDetector.detect(graySign, signKeypoints);
 
-	        Mat objectDescriptor = new Mat();
-	        Mat signDescriptor = new Mat();
-	        orbExtractor.compute(grayObject, objectKeypoints, objectDescriptor);
-	        orbExtractor.compute(graySign, signKeypoints, signDescriptor);
+        Mat objectDescriptor = new Mat();
+        Mat signDescriptor = new Mat();
+        orbExtractor.compute(grayObject, objectKeypoints, objectDescriptor);
+        orbExtractor.compute(graySign, signKeypoints, signDescriptor);
 
-	        // Matching avec BruteForce
-	        DescriptorMatcher matcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE);
-	        MatOfDMatch matches = new MatOfDMatch();
-	        matcher.match(objectDescriptor, signDescriptor, matches);
+        // Matching avec BruteForce
+        DescriptorMatcher matcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE);
+        MatOfDMatch matches = new MatOfDMatch();
+        matcher.match(objectDescriptor, signDescriptor, matches);
 
-	        System.out.println("Matchs : " + matches.toArray().length);
+        System.out.println("Matchs : " + matches.toArray().length);
 
-	        // Affichage du résultat des correspondances
-	        Mat matchedImage = new Mat();
-	        Features2d.drawMatches(sObject, objectKeypoints, sroadSign, signKeypoints, matches, matchedImage);
+        // Affichage du résultat des correspondances
+        Mat matchedImage = new Mat();
+        Features2d.drawMatches(sObject, objectKeypoints, sroadSign, signKeypoints, matches, matchedImage);
 
-	     // Enregistre l'image résultat dans un fichier
-	        Highgui.imwrite("resultat_matching.jpg", matchedImage);
-	        System.out.println("✅ Résultat sauvegardé sous 'resultat_matching.jpg'");
+     // Enregistre l'image résultat dans un fichier
+        Highgui.imwrite("resultat_matching.jpg", matchedImage);
+        System.out.println("✅ Résultat sauvegardé sous 'resultat_matching.jpg'");
 
-	    }
-	}
+    }
+	
+	// version 1.0
+	/*public static void matching(String fichier) {
+		// La mise à l'échelle
+		Mat sroadSign = readImage(fichier);
+		Mat sObject = new Mat();
+		Imgproc.resize(object, sObject, sroadSign.size());
+		Mat grayObject = new Mat(sObject.rows(), sObject.cols(), sObject.type());
+		Imgproc.cvtColor(sObject, grayObject, Imgproc.COLOR_BGRA2GRAY);
+		Core.normalize(grayObject, grayObject, 0, 255, Core.NORM_MINMAX);
+		
+		Mat graySign = new Mat(sroadSign.rows(), sroadSign.cols(), sroadSign.type());
+		Imgproc.cvtColor(sroadSign, graySign, Imgproc.COLOR_BGRA2GRAY);
+		Core.normalize(graySign, graySign, 0, 255, Core.NORM_MINMAX);
+		
+		// Extraction des descripteurs et keypoints
+		FeatureDetector orbDetector = FeatureDetector.create(FeatureDetector.ORB);
+		DescriptorExtractor orbExtractor = DescriptorExtractor.create(DescriptorExtractor.ORB);
+		
+		MatOfKeyPoint objectKeypoints = new MatOfKeyPoint();
+		orbDetector.detect(grayObject, objectKeypoints);
+		
+		MatOfKeyPoint signKeypoints = new MatOfKeyPoint();
+		orbDetector.detect(graySign, signKeypoints);
+		
+		MatOfKeyPoint objectDescriptor = new MatOfKeyPoint();
+		orbDetector.detect(grayObject, objectKeypoints, objectDescriptor);
+		
+		Mat signDescriptor = new Mat(sroadSign.rows(), sroadSign.cols(), sroadSign.type());
+		orbExtractor.compute(graySign, signKeypoints, signDescriptor);
+		
+		// Faire le matching
+		MatOfDMatch matchs = new MatOfDMatch();
+		DescriptorMatcher matcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE);
+		matcher.match(objectDescriptor, signDescriptor, matchs);
+		System.out.println(matchs.dump());
+		Mat matchedImage = new Mat(sroadSign.rows(), sroadSign.cols() * 2, sroadSign.type());
+		Features2d.drawMatches(sObject, objectKeypoints, sroadSign, signKeypoints, matchs, matchedImage);
+	}*/
+}
