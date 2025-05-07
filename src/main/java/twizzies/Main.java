@@ -37,12 +37,12 @@ import org.opencv.imgproc.Imgproc;
 public class Main {
 	public static void main(String[] args) {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-		// showCMD(readImage("opencv.png"));
+		 //showCMD(readImage("opencv.png"));
 		
-		// showColorChannels(separateColorsChannelsrGrayscale(readImage("bgr.png")));
-		// showColorChannels(separateColorsChannelsrRGB(readImage("bgr.png")));
+		 //showColorChannels(separateColorsChannelsrGrayscale(readImage("bgr.png")));
+		 //showColorChannels(separateColorsChannelsrRGB(readImage("bgr.png")));
 		
-		// showColorChannels(transposeToHSV(readImage("hsv.png")));
+		 //showColorChannels(transposeToHSV(readImage("hsv.png")));
 		
 		// showImage("Smoothed Thresheld Image",thresholding(readImage("circles.jpg"),0,10));
 		
@@ -52,6 +52,8 @@ public class Main {
 		//extraireContourRouge("circles.jpg");
 		//extraireCercleRouge("circles_rectangles.jpg");
 		//extraireCercleRouge("Billard_Balls.jpg");
+		matching("Stanislas.jpg");
+		
 	}
 
 	public static Mat readImage(String fichier) {
@@ -260,42 +262,64 @@ public class Main {
 			showImage("Dettection cercles rouges", m);
 		}
 	}
+*/
+	  public static void matching(String fichier) {
+	        // Chargement de l'image cible (panneau routier)
+	        Mat sroadSign = Highgui.imread(fichier);
+	        if (sroadSign.empty()) {
+	            System.out.println("Erreur : image non chargée !");
+	            return;
+	        }
 
-	public static void matching(String fichier) {
-		// La mise à l'échelle
-		Mat sroadSign = Highgui.imread(objectfile);
-		Mat sObject = new Mat();
-		Imgproc.resize(object, sObject, sroadSign.size());
-		Mat grayObject = new Mat(sObject.rows(), sObject.cols(), sObject.type());
-		Imgproc.cvtColor(sObject, grayObject, Imgproc.COLOR_BGRA2GRAY);
-		Core.normalize(grayObject, grayObject, 0, 255, Core.NORM_MINMAX);
-		
-		Mat graySign = new Mat(sroadSign.rows(), sroadSign.cols(), sroadSign.type());
-		Imgproc.cvtColor(sroadSign, graySign, Imgproc.COLOR_BGRA2GRAY);
-		Core.normalize(graySign, graySign, 0, 255, Core.NORM_MINMAX);
-		
-		// Extraction des descripteurs et keypoints
-		FeatureDetector orbDetector = FeatureDetector.create(FeatureDetector.ORB);
-		DescriptorExtractor orbExtractor = DescriptorExtractor.create(DescriptorExtractor.ORB);
-		
-		MatOfKeyPoint objectKeypoints = new MatOfKeyPoint();
-		orbDetector.detect(grayObject, objectKeypoints);
-		
-		MatOfKeyPoint signKeypoints = new MatOfKeyPoint();
-		orbDetector.detect(graySign, signKeypoints);
-		
-		MatOfKeyPoint objectDescriptor = new MatOfKeyPoint();
-		orbDetector.detect(grayObject, objectKeypoints, objectDescriptor);
-		
-		Mat signDescriptor = new Mat(sroadSign.rows(), sroadSign.cols(), sroadSign.type());
-		orbExtractor.compute(graySign, signKeypoints, signDescriptor);
-		
-		// Faire le matching
-		MatOfDMatch matchs = new MatOfDMatch();
-		DescriptorMatcher matcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE);
-		matcher.match(objectDescriptor, signDescriptor, matchs);
-		System.out.println(matchs.dump());
-		Mat matchedImage = new Mat(sroadSign.rows(), sroadSign.cols() * 2, sroadSign.type());
-		Features2d.drawMatches(sObject, objectKeypoints, sroadSign, signKeypoints, matchs, matchedImage);
-	}*/
-}
+	        // Exemple : objet à détecter, ici chargé depuis un autre fichier
+	        String objectfile = "StanislasFace.jpg";
+	        Mat object = Highgui.imread(objectfile);
+	        if (object.empty()) {
+	            System.out.println("Erreur : image objet non chargée !");
+	            return;
+	        }
+
+	        // Mise à l'échelle
+	        Mat sObject = new Mat();
+	        Imgproc.resize(object, sObject, sroadSign.size());
+
+	        // Conversion en niveaux de gris et normalisation
+	        Mat grayObject = new Mat();
+	        Imgproc.cvtColor(sObject, grayObject, Imgproc.COLOR_BGR2GRAY);
+	        Core.normalize(grayObject, grayObject, 0, 255, Core.NORM_MINMAX);
+
+	        Mat graySign = new Mat();
+	        Imgproc.cvtColor(sroadSign, graySign, Imgproc.COLOR_BGR2GRAY);
+	        Core.normalize(graySign, graySign, 0, 255, Core.NORM_MINMAX);
+
+	        // Détection de points clés (keypoints) et extraction descripteurs ORB
+	        FeatureDetector orbDetector = FeatureDetector.create(FeatureDetector.ORB);
+	        DescriptorExtractor orbExtractor = DescriptorExtractor.create(DescriptorExtractor.ORB);
+
+	        MatOfKeyPoint objectKeypoints = new MatOfKeyPoint();
+	        MatOfKeyPoint signKeypoints = new MatOfKeyPoint();
+	        orbDetector.detect(grayObject, objectKeypoints);
+	        orbDetector.detect(graySign, signKeypoints);
+
+	        Mat objectDescriptor = new Mat();
+	        Mat signDescriptor = new Mat();
+	        orbExtractor.compute(grayObject, objectKeypoints, objectDescriptor);
+	        orbExtractor.compute(graySign, signKeypoints, signDescriptor);
+
+	        // Matching avec BruteForce
+	        DescriptorMatcher matcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE);
+	        MatOfDMatch matches = new MatOfDMatch();
+	        matcher.match(objectDescriptor, signDescriptor, matches);
+
+	        System.out.println("Matchs : " + matches.toArray().length);
+
+	        // Affichage du résultat des correspondances
+	        Mat matchedImage = new Mat();
+	        Features2d.drawMatches(sObject, objectKeypoints, sroadSign, signKeypoints, matches, matchedImage);
+
+	     // Enregistre l'image résultat dans un fichier
+	        Highgui.imwrite("resultat_matching.jpg", matchedImage);
+	        System.out.println("✅ Résultat sauvegardé sous 'resultat_matching.jpg'");
+
+	    }
+	}
