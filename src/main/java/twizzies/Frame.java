@@ -21,6 +21,7 @@ public class Frame extends JFrame {
     private Vector<Mat> matricesHSV;
     private Vector<Mat> matricesContourRouge;
     private Vector<Mat> panneauxDetecte;
+    private Vector<Mat> panneauxDetecteV2;
 
     public Frame() {
         // Configuration de la fenêtre
@@ -64,6 +65,7 @@ public class Frame extends JFrame {
         matricesHSV = TraitementImage.transposeToHSV(matrice.clone());
         matricesContourRouge = TraitementImage.surroundCircles(matrice.clone(), 0, 10, 160, 180);
         panneauxDetecte = TraitementImage.DetectSign(image);
+        panneauxDetecteV2 = TraitementImage.DetectSignV2(image);
         BouttonRefresh();
 
     }
@@ -72,12 +74,18 @@ public class Frame extends JFrame {
         if (boutonPanel != null) {
             boutonPanel.removeAll();
         }
+        if (panel != null) {
+            panel.removeAll();
+        }
+
         Button button = new Button(this, "Charger image", boutonPanel, 10, 30, 2000, 20);
-        Button button1 = new Button(this, "Visualiser image", boutonPanel, image, 30, 30, 2000, 20);
+        Button button1 = new Button(this, "Visualiser image", boutonPanel, panel,  matrice.clone(), 30, 30, 2000, 20);
         Button button2 = new Button(this, "Image hsv", boutonPanel, panel, matricesHSV, 50, 30, 2000, 20);
         Button button3 = new Button(this, "Extraction des contours", boutonPanel, panel, matricesContourRouge, 70, 30,
                 2000, 20);
         Button button4 = new Button(this, "Detection Panneaux methode1", boutonPanel, panel, panneauxDetecte, 90, 30,
+                2000, 20);
+        Button button5 = new Button(this, "Detection Panneaux methode2", boutonPanel, panel, panneauxDetecte, 30, 60,
                 2000, 20);
 
         this.setVisible(true);

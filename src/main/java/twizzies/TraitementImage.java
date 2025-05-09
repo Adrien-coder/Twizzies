@@ -362,4 +362,86 @@ public class TraitementImage {
         return results;
     }
 
+    // Renvoi la difference en valeur absolue de pixels noirs entre deux image
+    public static float PourcentageNetB(Mat sroadSign, Mat object) {
+        float matchingValue = 0;
+        if (sroadSign.dims() < 1 || object.dims() < 1) {
+            System.out.println("here");
+            return 0;
+
+        }
+
+        // Mise à l'échelle
+        Mat sObject = new Mat();
+        Imgproc.resize(object, sObject, sroadSign.size());
+
+        // Conversion en niveaux de gris et normalisation
+        int pixelNobject = 0;
+        int pixelNRoad = 0;
+        Mat NBObject = thresholdingMultipleColors(object, 0, 10, 160, 180);
+        Mat NBSignRoad = thresholdingMultipleColors(sroadSign, 0, 10, 160, 180);
+        for (int i = 0; i < NBObject.height(); i++) {
+            for (int j = 0; j < NBObject.width(); j++) {
+                double[] pixel = NBObject.get(i, j);
+                if (pixel[0] == 0) {
+                    pixelNobject++;
+                }
+            }
+        }
+        for (int i = 0; i < NBSignRoad.height(); i++) {
+            for (int j = 0; j < NBSignRoad.width(); j++) {
+                double[] pixel = NBSignRoad.get(i, j);
+                if (pixel[0] == 0) {
+                    pixelNRoad++;
+                }
+            }
+        }
+        matchingValue = Math.abs(pixelNobject - pixelNRoad);
+
+        return matchingValue;
+    }
+
+    public static int matchingtrafficSignV2(Mat object) {
+
+        File dossierRef = new File("ref");
+        File[] listeRef = dossierRef.listFiles();
+        Vector<Float> matchingValues = new Vector<Float>();
+        for (File reference : listeRef) {
+            float a = PourcentageNetB(readFile(reference), object);
+            matchingValues.add(a);
+        }
+
+        // detection de la meilleur correspondance par 'vote'
+        float minValue = Collections.min(matchingValues);
+        int indiceOfBestMatch = 0;
+        float value = matchingValues.get(indiceOfBestMatch);
+        while (value != minValue) {
+            indiceOfBestMatch++;
+            value = matchingValues.get(indiceOfBestMatch);
+        }
+        System.out.println(listeRef[indiceOfBestMatch].getName());
+        return indiceOfBestMatch;
+
+    }
+
+    public static Vector<Mat> DetectSignV2(String img) {
+        // panneaux de reference
+        File dossierRef = new File("ref");
+        File[] listeRef = dossierRef.listFiles();
+
+        Vector<Mat> results = new Vector<Mat>();
+        // convert to Mat
+        Mat image = readImage(img);
+
+        results.add(image.clone());
+        // detect Red circles
+        Vector<Mat> imgs = surroundCircles(image, 0, 10, 160, 180);
+
+        for (int i = 0; i < imgs.size(); i++) {
+            int a = matchingtrafficSignV2(imgs.get(i));
+            results.add(readFile(listeRef[a]).clone());
+        }
+
+        return results;
+    }
 }

@@ -28,8 +28,6 @@ public class Main {
 		// TraitementImage.matchingImageVector(
 		// TraitementImage.surroundCircles(TraitementImage.readImage("Billard_Balls.jpg"),
 		// 0, 10, 160, 180),
-		// TraitementImage.readImage("Ball_three.png"));
-
 		// Mat MatriceVide = new Mat();
 		// Mat MatriceVide2 = new Mat();
 		// float matchValue = TraitementImage.matching(MatriceVide2, MatriceVide);
