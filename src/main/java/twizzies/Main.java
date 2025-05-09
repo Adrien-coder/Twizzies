@@ -33,7 +33,8 @@ public class Main {
 		// Mat MatriceVide = new Mat();
 		// Mat MatriceVide2 = new Mat();
 		// float matchValue = TraitementImage.matching(MatriceVide2, MatriceVide);
-		TraitementImage.DetectSign("panneaux\\p10.jpg");
+		// TraitementImage.DetectSign("panneaux\\p10.jpg");*
+		Frame f = new Frame();
 	}
 
 }
