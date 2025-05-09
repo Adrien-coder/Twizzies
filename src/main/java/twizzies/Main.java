@@ -23,10 +23,17 @@ public class Main {
 		// showImageVector(surroundCircles(readImage("circles_rectangles.jpg"),0,10,160,180));
 		// showImageVector(surroundCircles(readImage("Billard_Balls.jpg"),0,10,160,180));
 
-		// matching(readImage("Billard_Balls.jpg"), readImage(Ball_13.png));
-		TraitementImage.matchingImageVector(
-				TraitementImage.surroundCircles(TraitementImage.readImage("Billard_Balls.jpg"), 0, 10, 160, 180),
-				TraitementImage.readImage("Ball_three.png"));
+		// TraitementImage.matching(TraitementImage.readImage("Billard_Balls.jpg"),
+		// TraitementImage.readImage("Ball_13.png"));
+		// TraitementImage.matchingImageVector(
+		// TraitementImage.surroundCircles(TraitementImage.readImage("Billard_Balls.jpg"),
+		// 0, 10, 160, 180),
+		// TraitementImage.readImage("Ball_three.png"));
+
+		// Mat MatriceVide = new Mat();
+		// Mat MatriceVide2 = new Mat();
+		// float matchValue = TraitementImage.matching(MatriceVide2, MatriceVide);
+		TraitementImage.DetectSign("panneaux\\p10.jpg");
 	}
 
 }

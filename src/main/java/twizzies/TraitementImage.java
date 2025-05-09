@@ -341,7 +341,9 @@ public class TraitementImage {
 
     }
 
-    public static void DetectSign(Mat image) {
+    public static void DetectSign(String img) {
+        // convert to Mat
+        Mat image = readImage(img);
         // detect Red circles
         Vector<Mat> imgs = surroundCircles(image, 0, 10, 160, 180);
 
