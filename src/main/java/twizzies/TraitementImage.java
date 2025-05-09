@@ -251,7 +251,12 @@ public class TraitementImage {
     }
 
     // matching entre deux image
-    public static void matching(Mat sroadSign, Mat object) {
+    public static float matching(Mat sroadSign, Mat object) {
+
+        if (sroadSign.dims() < 1 || object.dims() < 1) {
+            return 0;
+        }
+
         // Mise à l'échelle
         Mat sObject = new Mat();
         Imgproc.resize(object, sObject, sroadSign.size());
@@ -288,11 +293,14 @@ public class TraitementImage {
         for (DMatch match : matches.toList()) {
             sum += match.distance;
         }
-        System.out.println(sum / matches.rows());
+
+        float MatchingValue = sum / matches.rows();
 
         Mat matchedImage = new Mat(sroadSign.rows(), sroadSign.cols() * 2, sroadSign.type());
         Features2d.drawMatches(sObject, objectKeypoints, sroadSign, signKeypoints, matches, matchedImage);
         showImage("Matching", matchedImage);
+
+        return MatchingValue;
     }
 
     public static void matchingImageVector(Vector<Mat> imgs, Mat object) {
