@@ -378,12 +378,25 @@ public class TraitementImage {
         // Conversion en niveaux de gris et normalisation
         int pixelNobject = 0;
         int pixelNRoad = 0;
-        Mat NBObject = thresholdingMultipleColors(object, 0, 10, 160, 180);
-        Mat NBSignRoad = thresholdingMultipleColors(sroadSign, 0, 10, 160, 180);
+
+        Mat NBObject = new Mat();
+        Mat NBSignObject1 = thresholdingMultipleColors(sObject, 0, 10, 160, 180);
+        Imgproc.cvtColor(sObject, NBObject, Imgproc.COLOR_BGR2GRAY);
+        Core.normalize(NBObject, NBObject, 0, 255, Core.NORM_MINMAX);
+
+        Mat NBSignRoad = new Mat();
+        Mat NBSignRoad1 = thresholdingMultipleColors(sroadSign, 0, 10, 160, 180);
+
+        Imgproc.cvtColor(sroadSign, NBSignRoad, Imgproc.COLOR_BGR2GRAY);
+        Core.normalize(NBSignRoad, NBSignRoad, 0, 255, Core.NORM_MINMAX);
+
+        Core.bitwise_or(NBSignRoad, NBSignRoad1, NBSignRoad);
+        Core.bitwise_or(NBObject, NBSignObject1, NBObject);
         for (int i = 0; i < NBObject.height(); i++) {
             for (int j = 0; j < NBObject.width(); j++) {
                 double[] pixel = NBObject.get(i, j);
-                if (pixel[0] == 0) {
+
+                if (pixel[0] == 255) {
                     pixelNobject++;
                 }
             }
@@ -391,36 +404,35 @@ public class TraitementImage {
         for (int i = 0; i < NBSignRoad.height(); i++) {
             for (int j = 0; j < NBSignRoad.width(); j++) {
                 double[] pixel = NBSignRoad.get(i, j);
-                if (pixel[0] == 0) {
+                if (pixel[0] == 255) {
                     pixelNRoad++;
                 }
             }
         }
         matchingValue = Math.abs(pixelNobject - pixelNRoad);
-
+        // System.out.println(matchingValue);
         return matchingValue;
     }
 
     public static int matchingtrafficSignV2(Mat object) {
-
-        File dossierRef = new File("ref");
-        File[] listeRef = dossierRef.listFiles();
-        Vector<Float> matchingValues = new Vector<Float>();
-        for (File reference : listeRef) {
-            float a = PourcentageNetB(readFile(reference), object);
-            matchingValues.add(a);
+        File dossierRef2 = new File("ref");
+        File[] listeRef2 = dossierRef2.listFiles();
+        Vector<Float> matchingValuesV2 = new Vector<Float>();
+        for (File reference : listeRef2) {
+            float b = PourcentageNetB(readFile(reference), object);
+            matchingValuesV2.add(b);
         }
 
         // detection de la meilleur correspondance par 'vote'
-        float minValue = Collections.min(matchingValues);
-        int indiceOfBestMatch = 0;
-        float value = matchingValues.get(indiceOfBestMatch);
+        float minValue = Collections.min(matchingValuesV2);
+        int indiceOfBestMatchV2 = 0;
+        float value = matchingValuesV2.get(indiceOfBestMatchV2);
         while (value != minValue) {
-            indiceOfBestMatch++;
-            value = matchingValues.get(indiceOfBestMatch);
+            indiceOfBestMatchV2++;
+            value = matchingValuesV2.get(indiceOfBestMatchV2);
         }
-        System.out.println(listeRef[indiceOfBestMatch].getName());
-        return indiceOfBestMatch;
+        System.out.println(listeRef2[indiceOfBestMatchV2].getName());
+        return indiceOfBestMatchV2;
 
     }
 

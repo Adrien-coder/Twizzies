@@ -79,13 +79,13 @@ public class Frame extends JFrame {
         }
 
         Button button = new Button(this, "Charger image", boutonPanel, 10, 30, 2000, 20);
-        Button button1 = new Button(this, "Visualiser image", boutonPanel, panel,  matrice.clone(), 30, 30, 2000, 20);
+        Button button1 = new Button(this, "Visualiser image", boutonPanel, panel, matrice.clone(), 30, 30, 2000, 20);
         Button button2 = new Button(this, "Image hsv", boutonPanel, panel, matricesHSV, 50, 30, 2000, 20);
         Button button3 = new Button(this, "Extraction des contours", boutonPanel, panel, matricesContourRouge, 70, 30,
                 2000, 20);
         Button button4 = new Button(this, "Detection Panneaux methode1", boutonPanel, panel, panneauxDetecte, 90, 30,
                 2000, 20);
-        Button button5 = new Button(this, "Detection Panneaux methode2", boutonPanel, panel, panneauxDetecte, 30, 60,
+        Button button5 = new Button(this, "Detection Panneaux methode2", boutonPanel, panel, panneauxDetecteV2, 30, 60,
                 2000, 20);
 
         this.setVisible(true);
