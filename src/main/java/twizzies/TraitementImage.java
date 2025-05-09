@@ -45,6 +45,11 @@ public class TraitementImage {
         return m;
     }
 
+    public static Mat readFile(File f) {
+        Mat m = Highgui.imread(f.getAbsolutePath());
+        return m;
+    }
+
     // permet de visualiser l'image dans l'invite de commande (pas utile à notre
     // application)
     public static void showCMD(Mat img) {
@@ -254,7 +259,9 @@ public class TraitementImage {
     public static float matching(Mat sroadSign, Mat object) {
 
         if (sroadSign.dims() < 1 || object.dims() < 1) {
+            System.out.println("here");
             return 0;
+
         }
 
         // Mise à l'échelle
@@ -306,6 +313,16 @@ public class TraitementImage {
     public static void matchingImageVector(Vector<Mat> imgs, Mat object) {
         for (int i = 0; i < imgs.size(); i++) {
             matching(imgs.get(i), object);
+        }
+    }
+
+    public static void matchingtrafficSign(Mat object) {
+
+        File dossierRef = new File("ref");
+        File[] listeRef = dossierRef.listFiles();
+        for (File reference : listeRef) {
+            float a = matching(readFile(reference), object);
+
         }
     }
 
