@@ -26,9 +26,8 @@ import org.opencv.imgproc.Imgproc;
 public class Button {
     String fichierImage;
 
-    // le bouton prend en compte le frame pour le placement de l'image au centre
-    public Button(Frame f, String nom, JPanel pannel, String fichierImage, int x, int y, int width, int height) {
-        this.fichierImage = fichierImage;
+    public Button(Frame f, String nom, JPanel pannel, int x, int y, int width, int height) {
+        // this.fichierImage = fichierImage;
         JButton bouton = new JButton(nom);
         bouton.setBackground(Color.pink);
         bouton.setBounds(x, y, width, height);
@@ -37,6 +36,25 @@ public class Button {
         bouton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // inserer ici le traitement d'image
+                Query q = new Query(f);
+
+            }
+        });
+
+    }
+
+    // le bouton prend en compte le frame pour le placement de l'image au centre
+    public Button(Frame f, String nom, JPanel pannel, String fichierImage, int x, int y, int width, int height) {
+        // this.fichierImage = fichierImage;
+        JButton bouton = new JButton(nom);
+        bouton.setBackground(Color.pink);
+        bouton.setBounds(x, y, width, height);
+        pannel.add(bouton);
+        pannel.setBackground(new Color(230, 223, 204));
+        bouton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // inserer ici le traitement d'image
+
                 insererImage(f, fichierImage);
 
             }
