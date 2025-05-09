@@ -364,6 +364,9 @@ public class TraitementImage {
 
     // Renvoi la difference en valeur absolue de pixels noirs entre deux image
     public static float PourcentageNetB(Mat sroadSign, Mat object) {
+
+        Vector<Mat> sroadSigns = surroundCircles(sroadSign, 0, 10, 160, 180);
+        sroadSign = sroadSigns.get(0);
         float matchingValue = 0;
         if (sroadSign.dims() < 1 || object.dims() < 1) {
             System.out.println("here");
@@ -380,7 +383,8 @@ public class TraitementImage {
         int pixelNRoad = 0;
 
         Mat NBObject = new Mat();
-        Mat NBSignObject1 = thresholdingMultipleColors(sObject, 0, 10, 160, 180);
+        // on enleve le contour rouge
+        Mat NBObject1 = thresholdingMultipleColors(sObject, 0, 10, 160, 180);
         Imgproc.cvtColor(sObject, NBObject, Imgproc.COLOR_BGR2GRAY);
         Core.normalize(NBObject, NBObject, 0, 255, Core.NORM_MINMAX);
 
@@ -391,7 +395,7 @@ public class TraitementImage {
         Core.normalize(NBSignRoad, NBSignRoad, 0, 255, Core.NORM_MINMAX);
 
         Core.bitwise_or(NBSignRoad, NBSignRoad1, NBSignRoad);
-        Core.bitwise_or(NBObject, NBSignObject1, NBObject);
+        Core.bitwise_or(NBObject, NBObject1, NBObject);
         for (int i = 0; i < NBObject.height(); i++) {
             for (int j = 0; j < NBObject.width(); j++) {
                 double[] pixel = NBObject.get(i, j);
@@ -410,7 +414,7 @@ public class TraitementImage {
             }
         }
         matchingValue = Math.abs(pixelNobject - pixelNRoad);
-        // System.out.println(matchingValue);
+        System.out.println(matchingValue);
         return matchingValue;
     }
 
@@ -450,8 +454,8 @@ public class TraitementImage {
         Vector<Mat> imgs = surroundCircles(image, 0, 10, 160, 180);
 
         for (int i = 0; i < imgs.size(); i++) {
-            int a = matchingtrafficSignV2(imgs.get(i));
-            results.add(readFile(listeRef[a]).clone());
+            int b = matchingtrafficSignV2(imgs.get(i));
+            results.add(readFile(listeRef[b]).clone());
         }
 
         return results;
