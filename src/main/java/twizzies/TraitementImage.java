@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.Vector;
@@ -300,7 +301,7 @@ public class TraitementImage {
         for (DMatch match : matches.toList()) {
             sum += match.distance;
         }
-
+        // plus le nombre est petit plus il y a de correspondance
         float MatchingValue = sum / matches.rows();
 
         Mat matchedImage = new Mat(sroadSign.rows(), sroadSign.cols() * 2, sroadSign.type());
@@ -316,13 +317,36 @@ public class TraitementImage {
         }
     }
 
-    public static void matchingtrafficSign(Mat object) {
+    // retourne l'indice du panneau de reference Correspondant le mieux
+    public static int matchingtrafficSign(Mat object) {
 
         File dossierRef = new File("ref");
         File[] listeRef = dossierRef.listFiles();
+        Vector<Float> matchingValues = new Vector<Float>();
         for (File reference : listeRef) {
             float a = matching(readFile(reference), object);
+            matchingValues.add(a);
+        }
 
+        // detection de la meilleur correspondance par 'vote'
+        float minValue = Collections.min(matchingValues);
+        int indiceOfBestMatch = 0;
+        float value = matchingValues.get(indiceOfBestMatch);
+        while (value != minValue) {
+            indiceOfBestMatch++;
+            value = matchingValues.get(indiceOfBestMatch);
+        }
+        System.out.println(listeRef[indiceOfBestMatch].getName());
+        return indiceOfBestMatch;
+
+    }
+
+    public static void DetectSign(Mat image) {
+        // detect Red circles
+        Vector<Mat> imgs = surroundCircles(image, 0, 10, 160, 180);
+
+        for (int i = 0; i < imgs.size(); i++) {
+            int a = matchingtrafficSign(imgs.get(i));
         }
     }
 
