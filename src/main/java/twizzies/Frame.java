@@ -31,15 +31,19 @@ public class Frame extends JFrame {
         panel.setBounds(70, 70, 100, 100);
 
         Mat matrice = TraitementImage.readImage("panneaux\\p10.jpg");
-        Mat matrice2 = TraitementImage.readImage("panneaux\\p10.jpg");
-        Vector<Mat> matricesHSV = TraitementImage.transposeToHSV(matrice);
-        Vector<Mat> matricesContourRouge = TraitementImage.surroundCircles(matrice2, 0, 10, 160, 180);
+
+        Vector<Mat> matricesHSV = TraitementImage.transposeToHSV(matrice.clone());
+        Vector<Mat> matricesContourRouge = TraitementImage.surroundCircles(matrice.clone(), 0, 10, 160, 180);
+        Vector<Mat> panneauxDetecte = TraitementImage.DetectSign("panneaux\\p10.jpg");
         JPanel boutonPanel = new JPanel();
         boutonPanel.setBackground(new Color(230, 223, 204));
 
         Button button = new Button(this, "Charger image", boutonPanel, panel, matrice, 10, 30, 2000, 20);
         Button button2 = new Button(this, "Image hsv", boutonPanel, panel, matricesHSV, 40, 30, 2000, 20);
+
         Button button3 = new Button(this, "Extraction des contours", boutonPanel, panel, matricesContourRouge, 60, 30,
+                2000, 20);
+        Button button4 = new Button(this, "Detection Panneaux methode1", boutonPanel, panel, panneauxDetecte, 60, 30,
                 2000, 20);
         add(boutonPanel, BorderLayout.NORTH);
 

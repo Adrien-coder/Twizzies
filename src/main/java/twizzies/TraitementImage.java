@@ -306,7 +306,7 @@ public class TraitementImage {
 
         Mat matchedImage = new Mat(sroadSign.rows(), sroadSign.cols() * 2, sroadSign.type());
         Features2d.drawMatches(sObject, objectKeypoints, sroadSign, signKeypoints, matches, matchedImage);
-        showImage("Matching", matchedImage);
+        // showImage("Matching", matchedImage);
 
         return MatchingValue;
     }
@@ -341,15 +341,25 @@ public class TraitementImage {
 
     }
 
-    public static void DetectSign(String img) {
+    public static Vector<Mat> DetectSign(String img) {
+        // panneaux de reference
+        File dossierRef = new File("ref");
+        File[] listeRef = dossierRef.listFiles();
+
+        Vector<Mat> results = new Vector<Mat>();
         // convert to Mat
         Mat image = readImage(img);
+
+        results.add(image.clone());
         // detect Red circles
         Vector<Mat> imgs = surroundCircles(image, 0, 10, 160, 180);
 
         for (int i = 0; i < imgs.size(); i++) {
             int a = matchingtrafficSign(imgs.get(i));
+            results.add(readFile(listeRef[a]).clone());
         }
+
+        return results;
     }
 
 }

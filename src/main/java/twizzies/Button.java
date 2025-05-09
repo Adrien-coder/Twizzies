@@ -19,7 +19,9 @@ import javax.swing.JPanel;
 
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
+import org.opencv.core.Size;
 import org.opencv.highgui.Highgui;
+import org.opencv.imgproc.Imgproc;
 
 public class Button {
     String fichierImage;
@@ -99,8 +101,14 @@ public class Button {
     }
 
     public static void showImage(Frame f, Mat img, JPanel panel) {
+
+        Size sz = new Size(300, 300);
+
+        Mat imageResized = new Mat();
+        Imgproc.resize(img, imageResized, sz);
+
         MatOfByte matOfByte = new MatOfByte();
-        Highgui.imencode(".png", img, matOfByte);
+        Highgui.imencode(".png", imageResized, matOfByte);
         byte[] byteArray = matOfByte.toArray();
         BufferedImage bufImage = null;
         try {
