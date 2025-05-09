@@ -69,14 +69,15 @@ public class Frame extends JFrame {
     }
 
     public void BouttonRefresh() {
-        if  (boutonPanel != null ) {
+        if (boutonPanel != null) {
             boutonPanel.removeAll();
         }
         Button button = new Button(this, "Charger image", boutonPanel, 10, 30, 2000, 20);
-        Button button2 = new Button(this, "Image hsv", boutonPanel, panel, matricesHSV, 40, 30, 2000, 20);
-        Button button3 = new Button(this, "Extraction des contours", boutonPanel, panel, matricesContourRouge, 60, 30,
+        Button button1 = new Button(this, "Visualiser image", boutonPanel, image, 30, 30, 2000, 20);
+        Button button2 = new Button(this, "Image hsv", boutonPanel, panel, matricesHSV, 50, 30, 2000, 20);
+        Button button3 = new Button(this, "Extraction des contours", boutonPanel, panel, matricesContourRouge, 70, 30,
                 2000, 20);
-        Button button4 = new Button(this, "Detection Panneaux methode1", boutonPanel, panel, panneauxDetecte, 80, 30,
+        Button button4 = new Button(this, "Detection Panneaux methode1", boutonPanel, panel, panneauxDetecte, 90, 30,
                 2000, 20);
 
         this.setVisible(true);
