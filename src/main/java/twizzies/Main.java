@@ -24,8 +24,9 @@ public class Main {
 		// showImageVector(surroundCircles(readImage("Billard_Balls.jpg"),0,10,160,180));
 
 		// matching(readImage("Billard_Balls.jpg"), readImage(Ball_13.png));
-		matchingImageVector(surroundCircles(readImage("Billard_Balls.jpg"), 0, 10, 160, 180),
-				readImage("Ball_three.png"));
+		TraitementImage.matchingImageVector(
+				TraitementImage.surroundCircles(TraitementImage.readImage("Billard_Balls.jpg"), 0, 10, 160, 180),
+				TraitementImage.readImage("Ball_three.png"));
 	}
 
 }
