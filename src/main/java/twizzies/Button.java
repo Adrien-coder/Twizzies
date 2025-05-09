@@ -42,7 +42,7 @@ public class Button {
 
     }
 
-    public Button(Frame f, String nom, JPanel pannel, Mat img, int x, int y, int width, int height) {
+    public Button(Frame f, String nom, JPanel pannel, JPanel impanel, Mat img, int x, int y, int width, int height) {
         // this.fichierImage = fichierImage;
         JButton bouton = new JButton(nom);
         bouton.setBackground(Color.pink);
@@ -52,14 +52,17 @@ public class Button {
         bouton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // inserer ici le traitement d'image
-                showImage(f, img);
+                impanel.removeAll();
+                impanel.repaint();
+                showImage(f, img, impanel);
 
             }
         });
 
     }
 
-    public Button(Frame f, String nom, JPanel pannel, Vector<Mat> imgs, int x, int y, int width, int height) {
+    public Button(Frame f, String nom, JPanel pannel, JPanel impanel, Vector<Mat> imgs, int x, int y, int width,
+            int height) {
         // this.fichierImage = fichierImage;
         JButton bouton = new JButton(nom);
         bouton.setBackground(Color.pink);
@@ -69,7 +72,9 @@ public class Button {
         bouton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // inserer ici le traitement d'image
-                showImageVector(f, imgs);
+                impanel.removeAll();
+                impanel.repaint();
+                showImageVector(f, imgs, impanel);
 
             }
         });
@@ -93,7 +98,7 @@ public class Button {
         }
     }
 
-    public static void showImage(Frame f, Mat img) {
+    public static void showImage(Frame f, Mat img, JPanel panel) {
         MatOfByte matOfByte = new MatOfByte();
         Highgui.imencode(".png", img, matOfByte);
         byte[] byteArray = matOfByte.toArray();
@@ -101,10 +106,6 @@ public class Button {
         try {
             InputStream in = new ByteArrayInputStream(byteArray);
             bufImage = ImageIO.read(in);
-            // création d'un Jpanel pour placer l'image
-            JPanel panel = new JPanel();
-            panel.setBackground(new Color(230, 223, 204));
-            panel.setBounds(70, 70, 100, 100);
             // BufferedImage img = ImageIO.read(new File(fichierImage));
             JLabel pic = new JLabel(new ImageIcon(bufImage));
             panel.add(pic);
@@ -116,9 +117,9 @@ public class Button {
         }
     }
 
-    public static void showImageVector(Frame f, Vector<Mat> imgs) {
+    public static void showImageVector(Frame f, Vector<Mat> imgs, JPanel panel) {
         for (int i = 0; i < imgs.size(); i++) {
-            showImage(f, imgs.get(i));
+            showImage(f, imgs.get(i), panel);
         }
     }
 
