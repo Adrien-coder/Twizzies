@@ -240,6 +240,7 @@ public class TraitementImage {
             double contourArea = Imgproc.contourArea(contour);
             matOfPoint2f.fromList(contour.toList());
             Imgproc.minEnclosingCircle(matOfPoint2f, center, radius);
+
             if ((contourArea / (Math.PI * radius[0] * radius[0])) >= 0.8) {
                 Core.circle(img, center, (int) radius[0], new Scalar(0, 255, 0), 2);
                 Rect rect = Imgproc.boundingRect(contour);
@@ -363,11 +364,10 @@ public class TraitementImage {
     }
 
     // Renvoi la difference en valeur absolue de pixels noirs entre deux image
-    public static float PourcentageNetB(Mat sroadSign, Mat object) {
+    public static double PourcentageNetB(Mat sroadSign, Mat object) {
+        sroadSign = surroundCircles(sroadSign, 0, 10, 160, 180).get(0);
 
-        Vector<Mat> sroadSigns = surroundCircles(sroadSign, 0, 10, 160, 180);
-        sroadSign = sroadSigns.get(0);
-        float matchingValue = 0;
+        double matchingValue = 0;
         if (sroadSign.dims() < 1 || object.dims() < 1) {
             System.out.println("here");
             return 0;
@@ -378,6 +378,10 @@ public class TraitementImage {
         Mat sObject = new Mat();
         Imgproc.resize(object, sObject, sroadSign.size());
 
+        // sObject = sObject.submat(20, sObject.height() - 20, 7, sObject.width() - 7);
+        // sroadSign = sroadSign.submat(20, sroadSign.height() - 20, 7,
+        // sroadSign.width() - 7);
+
         // Conversion en niveaux de gris et normalisation
         int pixelNobject = 0;
         int pixelNRoad = 0;
@@ -385,17 +389,27 @@ public class TraitementImage {
         Mat NBObject = new Mat();
         // on enleve le contour rouge
         Mat NBObject1 = thresholdingMultipleColors(sObject, 0, 10, 160, 180);
-        Imgproc.cvtColor(sObject, NBObject, Imgproc.COLOR_BGR2GRAY);
-        Core.normalize(NBObject, NBObject, 0, 255, Core.NORM_MINMAX);
 
         Mat NBSignRoad = new Mat();
         Mat NBSignRoad1 = thresholdingMultipleColors(sroadSign, 0, 10, 160, 180);
 
         Imgproc.cvtColor(sroadSign, NBSignRoad, Imgproc.COLOR_BGR2GRAY);
         Core.normalize(NBSignRoad, NBSignRoad, 0, 255, Core.NORM_MINMAX);
+        Imgproc.cvtColor(sObject, NBObject, Imgproc.COLOR_BGR2GRAY);
+        Core.normalize(NBObject, NBObject, 0, 255, Core.NORM_MINMAX);
 
         Core.bitwise_or(NBSignRoad, NBSignRoad1, NBSignRoad);
         Core.bitwise_or(NBObject, NBObject1, NBObject);
+
+        // on vient couper les matrice pour seulement avoir l'interieur des cercles
+        NBObject = NBObject.submat(40, NBObject.height() - 40, 40, NBObject.width() - 40);
+        NBSignRoad = NBSignRoad.submat(40, NBSignRoad.height() - 40, 40, NBSignRoad.width() - 40);
+        showImage(null, NBObject);
+        showImage(null, NBSignRoad);
+        // on limite la recherche à l'interieur du cercle (on les initialise en double
+        // pour la division)
+        double c1 = 0;
+        double c2 = 0;
         for (int i = 0; i < NBObject.height(); i++) {
             for (int j = 0; j < NBObject.width(); j++) {
                 double[] pixel = NBObject.get(i, j);
@@ -403,6 +417,7 @@ public class TraitementImage {
                 if (pixel[0] == 255) {
                     pixelNobject++;
                 }
+                c1++;
             }
         }
         for (int i = 0; i < NBSignRoad.height(); i++) {
@@ -411,9 +426,10 @@ public class TraitementImage {
                 if (pixel[0] == 255) {
                     pixelNRoad++;
                 }
+                c2++;
             }
         }
-        matchingValue = Math.abs(pixelNobject - pixelNRoad);
+        matchingValue = Math.abs((pixelNRoad / c2) - (pixelNobject / c1));
         System.out.println(matchingValue);
         return matchingValue;
     }
@@ -421,16 +437,16 @@ public class TraitementImage {
     public static int matchingtrafficSignV2(Mat object) {
         File dossierRef2 = new File("ref");
         File[] listeRef2 = dossierRef2.listFiles();
-        Vector<Float> matchingValuesV2 = new Vector<Float>();
+        Vector<Double> matchingValuesV2 = new Vector<Double>();
         for (File reference : listeRef2) {
-            float b = PourcentageNetB(readFile(reference), object);
+            double b = PourcentageNetB(readFile(reference), object);
             matchingValuesV2.add(b);
         }
 
         // detection de la meilleur correspondance par 'vote'
-        float minValue = Collections.min(matchingValuesV2);
+        double minValue = Collections.min(matchingValuesV2);
         int indiceOfBestMatchV2 = 0;
-        float value = matchingValuesV2.get(indiceOfBestMatchV2);
+        double value = matchingValuesV2.get(indiceOfBestMatchV2);
         while (value != minValue) {
             indiceOfBestMatchV2++;
             value = matchingValuesV2.get(indiceOfBestMatchV2);
