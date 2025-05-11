@@ -378,10 +378,6 @@ public class TraitementImage {
         Mat sObject = new Mat();
         Imgproc.resize(object, sObject, sroadSign.size());
 
-        // sObject = sObject.submat(20, sObject.height() - 20, 7, sObject.width() - 7);
-        // sroadSign = sroadSign.submat(20, sroadSign.height() - 20, 7,
-        // sroadSign.width() - 7);
-
         // Conversion en niveaux de gris et normalisation
         int pixelNobject = 0;
         int pixelNRoad = 0;
@@ -404,8 +400,7 @@ public class TraitementImage {
         // on vient couper les matrice pour seulement avoir l'interieur des cercles
         NBObject = NBObject.submat(40, NBObject.height() - 40, 40, NBObject.width() - 40);
         NBSignRoad = NBSignRoad.submat(40, NBSignRoad.height() - 40, 40, NBSignRoad.width() - 40);
-        showImage(null, NBObject);
-        showImage(null, NBSignRoad);
+
         // on limite la recherche à l'interieur du cercle (on les initialise en double
         // pour la division)
         double c1 = 0;

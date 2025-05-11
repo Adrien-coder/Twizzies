@@ -29,7 +29,7 @@ public class Button {
     public Button(Frame f, String nom, JPanel pannel, int x, int y, int width, int height) {
         // this.fichierImage = fichierImage;
         JButton bouton = new JButton(nom);
-        bouton.setBackground(Color.pink);
+        bouton.setBackground(new Color(56, 163, 179));
         bouton.setBounds(x, y, width, height);
         pannel.add(bouton);
         pannel.setBackground(new Color(230, 223, 204));
@@ -47,7 +47,7 @@ public class Button {
     public Button(Frame f, String nom, JPanel pannel, String fichierImage, int x, int y, int width, int height) {
         // this.fichierImage = fichierImage;
         JButton bouton = new JButton(nom);
-        bouton.setBackground(Color.pink);
+        bouton.setBackground(new Color(56, 163, 179));
         bouton.setBounds(x, y, width, height);
         pannel.add(bouton);
         pannel.setBackground(new Color(230, 223, 204));
@@ -65,7 +65,7 @@ public class Button {
     public Button(Frame f, String nom, JPanel pannel, JPanel impanel, Mat img, int x, int y, int width, int height) {
         // this.fichierImage = fichierImage;
         JButton bouton = new JButton(nom);
-        bouton.setBackground(Color.pink);
+        bouton.setBackground(new Color(56, 163, 179));
         bouton.setBounds(x, y, width, height);
         pannel.add(bouton);
         pannel.setBackground(new Color(230, 223, 204));
@@ -85,7 +85,7 @@ public class Button {
             int height) {
         // this.fichierImage = fichierImage;
         JButton bouton = new JButton(nom);
-        bouton.setBackground(Color.pink);
+        bouton.setBackground(new Color(56, 163, 179));
         bouton.setBounds(x, y, width, height);
         pannel.add(bouton);
         pannel.setBackground(new Color(230, 223, 204));

@@ -33,17 +33,12 @@ public class Frame extends JFrame {
 
         // ajout du panel pour l'image
         panel = new JPanel();
-        panel.setBackground(new Color(230, 223, 204));
+        panel.setBackground(new Color(250, 235, 215));
         panel.setBounds(70, 70, 100, 100);
         boutonPanel = new JPanel();
 
-        // de de de choisir l'image
-
         // on impose une image par defaut si il n'y en a pas
         preparationImage();
-        System.out.println("..");
-        System.out.println(image);
-        System.out.println("..");
 
         boutonPanel.setBackground(new Color(230, 223, 204));
         BouttonRefresh();
@@ -58,7 +53,7 @@ public class Frame extends JFrame {
     public void preparationImage() {
         if (image == null) {
             System.out.println("there");
-            image = "ref\\ref90.jpg";
+            image = "ref\\ref30.jpg";
         }
 
         matrice = TraitementImage.readImage(image);
@@ -78,15 +73,15 @@ public class Frame extends JFrame {
             panel.removeAll();
         }
 
-        Button button = new Button(this, "Charger image", boutonPanel, 10, 30, 2000, 20);
-        Button button1 = new Button(this, "Visualiser image", boutonPanel, panel, matrice.clone(), 30, 30, 2000, 20);
-        Button button2 = new Button(this, "Image hsv", boutonPanel, panel, matricesHSV, 50, 30, 2000, 20);
+        Button button = new Button(this, "Charger image", boutonPanel, 10, 30, 2000, 50);
+        Button button1 = new Button(this, "Visualiser image", boutonPanel, panel, matrice.clone(), 30, 30, 2000, 50);
+        Button button2 = new Button(this, "Image hsv", boutonPanel, panel, matricesHSV, 50, 30, 2000, 50);
         Button button3 = new Button(this, "Extraction des contours", boutonPanel, panel, matricesContourRouge, 70, 30,
-                2000, 20);
+                2000, 50);
         Button button4 = new Button(this, "Detection Panneaux methode1", boutonPanel, panel, panneauxDetecte, 90, 30,
-                2000, 20);
+                2000, 50);
         Button button5 = new Button(this, "Detection Panneaux methode2", boutonPanel, panel, panneauxDetecteV2, 30, 60,
-                2000, 20);
+                2000, 50);
 
         this.setVisible(true);
     }
