@@ -5,15 +5,12 @@ import java.awt.Color;
 import java.util.Vector;
 
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.opencv.core.Mat;
 
 public class Frame extends JFrame {
 
-    private JLabel imageLabel;
-    // variable temporaire
     private String image;
     JPanel boutonPanel;
     JPanel panel;
@@ -66,7 +63,8 @@ public class Frame extends JFrame {
             panneauxDetecteV2 = TraitementImage.DetectSignV2(image);
             BouttonRefresh();
         } else if (type.equals("avi") || type.equals("mkv") || type.equals("mp4")) {
-            // System.out.println("video");
+            Vector<Mat> video = TraitementImage.echantillonnerEtTraiterVideo(image, 10);
+            genererVideo(video);
 
         }
 
@@ -101,6 +99,19 @@ public class Frame extends JFrame {
         }
         return "Unknown";
     }
+
+    public void genererVideo(Vector<Mat> images) {
+        for (int i = 0; i < images.size(); i++) {
+            Button.showImage(this, images.get(i), panel);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+
+    }
+
     public void setImage(String img) {
         this.image = img;
         preparationImage();
