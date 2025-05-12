@@ -495,10 +495,6 @@ public class TraitementImage {
         return results;
     }
     
-    
-    
-    
-    
     /**
      * Échantillonne et traite les images d'une vidéo
      * 
@@ -638,55 +634,4 @@ public class TraitementImage {
 	    
 	    return treatedImages;
 	}
-	
-	public static void afficherImagesAvecTaux(Vector<Mat> images, int taux) {
-        if (images.isEmpty()) {
-            System.err.println("Erreur : Le vecteur d'images est vide");
-            return;
-        }
-
-        JFrame frame = new JFrame("Image");
-        JLabel label = new JLabel();
-        frame.getContentPane().add(label, BorderLayout.CENTER);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
-
-        for (Mat image : images) {
-            if (image.empty()) {
-                System.err.println("Erreur : Une des images est vide");
-                continue;
-            }
-
-            showImage("1", image);
-            
-            try {
-            	Thread.sleep(taux); // attente en millisecondes
-            } catch (InterruptedException e) {
-                    e.printStackTrace();
-            }
-        }
-
-        frame.dispose(); // Fermer la fenêtre après l'affichage
-    }
-
-    private static BufferedImage matToBufferedImage(Mat mat) {
-        // Convertit une Mat OpenCV (type CV_8UC3) en BufferedImage
-        int width = mat.width();
-        int height = mat.height();
-        int channels = mat.channels();
-
-        byte[] sourcePixels = new byte[width * height * channels];
-        mat.get(0, 0, sourcePixels);
-
-        BufferedImage image;
-        if (channels == 3) {
-            image = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
-        } else {
-            image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
-        }
-
-        final byte[] targetPixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
-        System.arraycopy(sourcePixels, 0, targetPixels, 0, sourcePixels.length);
-        return image;
-    }
 }
