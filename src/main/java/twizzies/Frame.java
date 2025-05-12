@@ -49,7 +49,6 @@ public class Frame extends JFrame {
 
     public void preparationImage() {
         if (image == null) {
-            System.out.println("there");
             image = "ref\\ref30.jpg";
         }
         String type = detectByExtension(image);
