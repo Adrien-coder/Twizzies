@@ -11,7 +11,7 @@ def readTrafficSigns(rootpath):
     images = [] # images
     labels = [] # corresponding labels
     print("Début lecture des fichiers")
-    for c in tqdm(range(0, 43)):
+    for c in tqdm(range(0, 45)):
         prefix = rootpath + '/' + format(c, '05d') + '/'
         gtFile = open(prefix + 'GT-'+ format(c, '05d') + '.csv')
         gtReader = csv.reader(gtFile, delimiter=';')
@@ -54,7 +54,7 @@ model = models.Sequential([
     layers.Flatten(),
     layers.Dense(64, activation='relu'),
     layers.Dropout(0.3),
-    layers.Dense(43)
+    layers.Dense(45)
 ])
 
 print("Compilation du modèle")
@@ -75,5 +75,5 @@ test_loss, test_acc = model.evaluate(test_images, test_labels, verbose=1)
 print(f"Précision sur l'ensemble de test: {test_acc}")
 
 # Exporter le modèle
-model.save('traffic_sign_model.keras')
+model.save('model.keras')
 print("Modèle exporté avec succès.")
