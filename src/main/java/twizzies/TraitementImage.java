@@ -36,7 +36,7 @@ import org.opencv.features2d.FeatureDetector;
 import org.opencv.features2d.Features2d;
 import org.opencv.highgui.Highgui;
 import org.opencv.imgproc.Imgproc;
-
+import org.opencv.highgui.VideoCapture;
 public class TraitementImage {
 
     // fonction qui permet de transformer un fichier image en une matrice
@@ -471,4 +471,63 @@ public class TraitementImage {
 
         return results;
     }
+    
+    
+    
+    
+    
+    /**
+     * Échantillonne et traite les images d'une vidéo
+     * 
+     * @param cheminVideo Chemin du fichier vidéo
+     * @param tauxEchantillonnage Nombre d'images à sauter entre chaque traitement 
+     *                            (1 = traiter chaque image, 2 = traiter une image sur deux, etc.)
+     * @return Liste des panneaux détectés
+     */
+    public static Vector<Mat> echantillonnerEtTraiterVideo(String cheminVideo, int tauxEchantillonnage) {
+        // Vecteur pour stocker les panneaux détectés
+        Vector<Mat> panneauxDetectes = new Vector<>();
+        
+        // Ouverture de la capture vidéo
+        VideoCapture camera = new VideoCapture(cheminVideo);
+        
+        // Vérification de l'ouverture de la vidéo
+        if (!camera.isOpened()) {
+            System.err.println("Erreur : Impossible d'ouvrir le fichier vidéo");
+            return panneauxDetectes;
+        }
+        
+        // Matrice pour stocker chaque image
+        Mat image = new Mat();
+        int compteurImages = 0;
+        
+        try {
+            // Lecture de chaque image de la vidéo
+            while (camera.read(image)) {
+                // Échantillonnage des images selon le taux spécifié
+                if (compteurImages % tauxEchantillonnage == 0) {
+                    // Détecter les panneaux dans l'image
+                    Vector<Mat> resultatsDetection = TraitementImage.DetectSign(cheminVideo);
+                    
+                    // Si des panneaux sont détectés (en excluant l'image originale)
+                    if (resultatsDetection.size() > 1) {
+                        // Ajouter les panneaux détectés (à partir du 2ème élément)
+                        for (int i = 1; i < resultatsDetection.size(); i++) {
+                            panneauxDetectes.add(resultatsDetection.get(i));
+                        }
+                    }
+                }
+                
+                compteurImages++;
+            }
+        } finally {
+            // Libération des ressources de la capture vidéo
+            camera.release();
+        }
+        
+        return panneauxDetectes;
+    }
+    
+   
+    
 }
