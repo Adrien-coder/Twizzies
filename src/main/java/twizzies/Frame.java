@@ -54,13 +54,20 @@ public class Frame extends JFrame {
         if (image == null) {
             image = "ref\\ref30.jpg";
         }
+        String type = detectByExtension(image);
 
-        matrice = TraitementImage.readImage(image);
-        matricesHSV = TraitementImage.transposeToHSV(matrice.clone());
-        matricesContourRouge = TraitementImage.surroundCircles(matrice.clone(), 0, 10, 160, 180);
-        panneauxDetecte = TraitementImage.DetectSign(image);
-        panneauxDetecteV2 = TraitementImage.DetectSignV2(image);
-        BouttonRefresh();
+        if (type.equals("jpg") || type.equals("png")) {
+
+            matrice = TraitementImage.readImage(image);
+            matricesHSV = TraitementImage.transposeToHSV(matrice.clone());
+            matricesContourRouge = TraitementImage.surroundCircles(matrice.clone(), 0, 10, 160, 180);
+            panneauxDetecte = TraitementImage.DetectSign(image);
+            panneauxDetecteV2 = TraitementImage.DetectSignV2(image);
+            BouttonRefresh();
+        } else if (type.equals("avi") || type.equals("mkv") || type.equals("mp4")) {
+            // System.out.println("video");
+
+        }
 
     }
 
@@ -85,6 +92,14 @@ public class Frame extends JFrame {
         this.setVisible(true);
     }
 
+    // reconnaitre le type de fichier
+    public String detectByExtension(String filename) {
+        int dotIndex = filename.lastIndexOf('.');
+        if (dotIndex > 0) {
+            return (filename.substring(dotIndex + 1).toLowerCase());
+        }
+        return "Unknown";
+    }
     public void setImage(String img) {
         this.image = img;
         preparationImage();
