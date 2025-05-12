@@ -432,7 +432,7 @@ public class TraitementImage {
             for (int j = 0; j < NBObject.width(); j++) {
                 double[] pixel = NBObject.get(i, j);
 
-                if (pixel[0] == 255) {
+                if (pixel[0] == 0) {
                     pixelNobject++;
                 }
                 c1++;
@@ -441,7 +441,7 @@ public class TraitementImage {
         for (int i = 0; i < NBSignRoad.height(); i++) {
             for (int j = 0; j < NBSignRoad.width(); j++) {
                 double[] pixel = NBSignRoad.get(i, j);
-                if (pixel[0] == 255) {
+                if (pixel[0] == 0) {
                     pixelNRoad++;
                 }
                 c2++;
