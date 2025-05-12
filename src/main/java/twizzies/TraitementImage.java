@@ -621,8 +621,10 @@ public class TraitementImage {
 	                // Détecter les panneaux dans l'image
 	                Mat detectionResult = DetectSignV3(image);
 	                
-	                // Ajouter les images traitées au vecteur de résultats
+	            	// Ajouter les images traitées au vecteur de résultats
 	                treatedImages.add(detectionResult);
+	                System.out.println(detectionResult.cols());
+	                System.out.println(detectionResult.rows());
 	            }
 	            
 	            imagesCounter++;
@@ -632,6 +634,7 @@ public class TraitementImage {
 	        camera.release();
 	    }
 	    
+	    System.out.println(treatedImages.size());
 	    return treatedImages;
 	}
 }

@@ -119,28 +119,30 @@ public class Button {
     }
 
     public static void showImage(Frame f, Mat img, JPanel panel) {
+    	if(img.cols()>0 && img.rows()>0) {
+    		Size sz = new Size(300, 300);
 
-        Size sz = new Size(300, 300);
-
-        Mat imageResized = new Mat();
-        Imgproc.resize(img, imageResized, sz);
-
-        MatOfByte matOfByte = new MatOfByte();
-        Highgui.imencode(".png", imageResized, matOfByte);
-        byte[] byteArray = matOfByte.toArray();
-        BufferedImage bufImage = null;
-        try {
-            InputStream in = new ByteArrayInputStream(byteArray);
-            bufImage = ImageIO.read(in);
-            // BufferedImage img = ImageIO.read(new File(fichierImage));
-            JLabel pic = new JLabel(new ImageIcon(bufImage));
-            panel.add(pic);
-            f.add(panel);
-            // recharger la frame pour faire apparaitre l'image
-            f.setVisible(true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            Mat imageResized = new Mat();
+            Imgproc.resize(img, imageResized, sz);
+    		//Mat imageResized = img;
+    		
+            MatOfByte matOfByte = new MatOfByte();
+            Highgui.imencode(".png", imageResized, matOfByte);
+            byte[] byteArray = matOfByte.toArray();
+            BufferedImage bufImage = null;
+            try {
+                InputStream in = new ByteArrayInputStream(byteArray);
+                bufImage = ImageIO.read(in);
+                // BufferedImage img = ImageIO.read(new File(fichierImage));
+                JLabel pic = new JLabel(new ImageIcon(bufImage));
+                panel.add(pic);
+                f.add(panel);
+                // recharger la frame pour faire apparaitre l'image
+                f.setVisible(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+    	}
     }
 
     public static void showImageVector(Frame f, Vector<Mat> imgs, JPanel panel) {
