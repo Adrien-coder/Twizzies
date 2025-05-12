@@ -1,6 +1,8 @@
 package twizzies;
 
+import java.awt.BorderLayout;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
@@ -549,6 +551,142 @@ public class TraitementImage {
         return panneauxDetectes;
     }
     
-   
+    public static Mat DetectSignV3(Mat image) {
+        // panneaux de reference
+        File dossierRef = new File("ref");
+        File[] listeRef = dossierRef.listFiles();
+
+        Vector<Mat> results = new Vector<Mat>();
+
+        results.add(image.clone());
+        // detect Red circles
+        Vector<Mat> imgs = surroundCircles(image, 0, 10, 160, 180);
+
+        for (int i = 0; i < imgs.size(); i++) {
+            int a = matchingtrafficSign(imgs.get(i));
+            results.add(readFile(listeRef[a]).clone());
+        }
+        
+        Mat resultat = surroundCirclesinImage(image, 0, 10, 160, 180);
+
+        return resultat;
+    }
     
+    public static Mat surroundCirclesinImage(Mat img, int lower_bound1, int higher_bound1, int lower_bound2, int higher_bound2) {
+        Mat threshold_img = thresholdingMultipleColors(img, lower_bound1, higher_bound1, lower_bound2, higher_bound2);
+
+        List<MatOfPoint> contours = extractContoursPoints(threshold_img);
+        MatOfPoint2f matOfPoint2f = new MatOfPoint2f();
+
+        float[] radius = new float[1];
+        Point center = new Point();
+        
+        for (int c = 0; c < contours.size(); c++) {
+            MatOfPoint contour = contours.get(c);
+            double contourArea = Imgproc.contourArea(contour);
+            matOfPoint2f.fromList(contour.toList());
+            Imgproc.minEnclosingCircle(matOfPoint2f, center, radius);
+
+            if ((contourArea / (Math.PI * radius[0] * radius[0])) >= 0.8) {
+                Core.circle(img, center, (int) radius[0], new Scalar(0, 255, 0), 2);
+            }
+        }
+        return img;
+    }
+
+	public static Vector<Mat> videoTreatment(String videoPath, int sampleRate) {
+	    // Vecteur pour stocker les panneaux détectés
+	    Vector<Mat> treatedImages = new Vector<>();
+	    
+	    File videoFile = new File(videoPath);
+	    if (!videoFile.exists()) {
+	        System.err.println("Error: File does not exist at path: " + videoPath);
+	        return treatedImages;
+	    }
+	    
+	    // Ouverture de la capture vidéo
+	    VideoCapture camera = new VideoCapture(videoPath);
+	    
+	    // Vérification de l'ouverture de la vidéo
+	    if (!camera.isOpened()) {
+	        System.err.println("Erreur : Impossible d'ouvrir le fichier vidéo");
+	        return treatedImages;
+	    }
+	    
+	    // Matrice pour stocker chaque image
+	    Mat image = new Mat();
+	    int imagesCounter = 0;
+	    
+	    try {
+	        // Lecture de chaque image de la vidéo
+	        while (camera.read(image)) {
+	            // Échantillonnage des images selon le taux spécifié
+	            if (imagesCounter % sampleRate == 0) {
+	                // Détecter les panneaux dans l'image
+	                Mat detectionResult = DetectSignV3(image);
+	                
+	                // Ajouter les images traitées au vecteur de résultats
+	                treatedImages.add(detectionResult);
+	            }
+	            
+	            imagesCounter++;
+	        }
+	    } finally {
+	        // Libération des ressources de la capture vidéo
+	        camera.release();
+	    }
+	    
+	    return treatedImages;
+	}
+	
+	public static void afficherImagesAvecTaux(Vector<Mat> images, int taux) {
+        if (images.isEmpty()) {
+            System.err.println("Erreur : Le vecteur d'images est vide");
+            return;
+        }
+
+        JFrame frame = new JFrame("Image");
+        JLabel label = new JLabel();
+        frame.getContentPane().add(label, BorderLayout.CENTER);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+
+        for (Mat image : images) {
+            if (image.empty()) {
+                System.err.println("Erreur : Une des images est vide");
+                continue;
+            }
+
+            showImage("1", image);
+            
+            try {
+            	Thread.sleep(taux); // attente en millisecondes
+            } catch (InterruptedException e) {
+                    e.printStackTrace();
+            }
+        }
+
+        frame.dispose(); // Fermer la fenêtre après l'affichage
+    }
+
+    private static BufferedImage matToBufferedImage(Mat mat) {
+        // Convertit une Mat OpenCV (type CV_8UC3) en BufferedImage
+        int width = mat.width();
+        int height = mat.height();
+        int channels = mat.channels();
+
+        byte[] sourcePixels = new byte[width * height * channels];
+        mat.get(0, 0, sourcePixels);
+
+        BufferedImage image;
+        if (channels == 3) {
+            image = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
+        } else {
+            image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+        }
+
+        final byte[] targetPixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+        System.arraycopy(sourcePixels, 0, targetPixels, 0, sourcePixels.length);
+        return image;
+    }
 }
