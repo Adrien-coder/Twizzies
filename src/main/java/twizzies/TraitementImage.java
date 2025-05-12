@@ -41,6 +41,10 @@ public class TraitementImage {
 
     // fonction qui permet de transformer un fichier image en une matrice
     public static Mat readImage(String fichier) {
+    	 // Gestion explicite du cas null
+        if (fichier == null) {
+            return null;
+        }
         File f = new File(fichier);
         Mat m = Highgui.imread(f.getAbsolutePath());
         return m;
@@ -163,6 +167,16 @@ public class TraitementImage {
 
     // seuillage de l'image pour un intervalle de couleur
     public static Mat thresholding(Mat img, int lower_bound, int higher_bound) {
+    	  // Gestion défensive des entrées null
+        if (img == null) {
+            return null;
+        }
+    	
+    	// Gestion des cas null et vide
+        if (img == null || img.empty()) {
+            return new Mat(); // Retourne une nouvelle Mat vide
+       }
+        
         Mat hsv_image = Mat.zeros(img.size(), img.type());
         Imgproc.cvtColor(img, hsv_image, Imgproc.COLOR_BGR2HSV);
         Mat threshold_img = new Mat();
@@ -259,7 +273,14 @@ public class TraitementImage {
 
     // matching entre deux image
     public static float matching(Mat sroadSign, Mat object) {
-
+    	  // Gestion des cas null
+        if (sroadSign == null || object == null) {
+            return 0.0f;
+        }
+        
+        if (sroadSign.empty() || object.empty()) {
+            return 0.0f;
+        }
         if (sroadSign.dims() < 1 || object.dims() < 1) {
             System.out.println("here");
             return 0;
