@@ -39,6 +39,7 @@ import org.opencv.features2d.Features2d;
 import org.opencv.highgui.Highgui;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.highgui.VideoCapture;
+
 public class TraitementImage {
 
     // fonction qui permet de transformer un fichier image en une matrice
@@ -279,14 +280,11 @@ public class TraitementImage {
         if (sroadSign == null || object == null) {
             return 0.0f;
         }
-        
         if (sroadSign.empty() || object.empty()) {
             return 0.0f;
         }
         if (sroadSign.dims() < 1 || object.dims() < 1) {
-            System.out.println("here");
             return 0;
-
         }
 
         // Mise à l'échelle
@@ -330,7 +328,7 @@ public class TraitementImage {
 
         Mat matchedImage = new Mat(sroadSign.rows(), sroadSign.cols() * 2, sroadSign.type());
         Features2d.drawMatches(sObject, objectKeypoints, sroadSign, signKeypoints, matches, matchedImage);
-        // showImage("Matching", matchedImage);
+        //showImage("Matching", matchedImage);
 
         return MatchingValue;
     }
@@ -360,7 +358,7 @@ public class TraitementImage {
             indiceOfBestMatch++;
             value = matchingValues.get(indiceOfBestMatch);
         }
-        System.out.println(listeRef[indiceOfBestMatch].getName());
+        //System.out.println(listeRef[indiceOfBestMatch].getName());
         return indiceOfBestMatch;
 
     }
@@ -391,10 +389,9 @@ public class TraitementImage {
         sroadSign = surroundCircles(sroadSign, 0, 10, 160, 180).get(0);
 
         double matchingValue = 0;
-        if (sroadSign.dims() < 1 || object.dims() < 1) {
-            System.out.println("here");
+        if (sroadSign.rows() < 1 || sroadSign.cols() < 1 || object.rows() < 1 || object.cols() < 1) {
+            //System.out.println("here");
             return 0;
-
         }
 
         // Mise à l'échelle
@@ -448,7 +445,7 @@ public class TraitementImage {
             }
         }
         matchingValue = Math.abs((pixelNRoad / c2) - (pixelNobject / c1));
-        System.out.println(matchingValue);
+        //System.out.println(matchingValue);
         return matchingValue;
     }
 
@@ -469,7 +466,7 @@ public class TraitementImage {
             indiceOfBestMatchV2++;
             value = matchingValuesV2.get(indiceOfBestMatchV2);
         }
-        System.out.println(listeRef2[indiceOfBestMatchV2].getName());
+        //System.out.println(listeRef2[indiceOfBestMatchV2].getName());
         return indiceOfBestMatchV2;
 
     }
@@ -495,58 +492,6 @@ public class TraitementImage {
         return results;
     }
     
-    /**
-     * Échantillonne et traite les images d'une vidéo
-     * 
-     * @param cheminVideo Chemin du fichier vidéo
-     * @param tauxEchantillonnage Nombre d'images à sauter entre chaque traitement 
-     *                            (1 = traiter chaque image, 2 = traiter une image sur deux, etc.)
-     * @return Liste des panneaux détectés
-     */
-    public static Vector<Mat> echantillonnerEtTraiterVideo(String cheminVideo, int tauxEchantillonnage) {
-        // Vecteur pour stocker les panneaux détectés
-        Vector<Mat> panneauxDetectes = new Vector<>();
-        
-        // Ouverture de la capture vidéo
-        VideoCapture camera = new VideoCapture(cheminVideo);
-        
-        // Vérification de l'ouverture de la vidéo
-        if (!camera.isOpened()) {
-            System.err.println("Erreur : Impossible d'ouvrir le fichier vidéo");
-            return panneauxDetectes;
-        }
-        
-        // Matrice pour stocker chaque image
-        Mat image = new Mat();
-        int compteurImages = 0;
-        
-        try {
-            // Lecture de chaque image de la vidéo
-            while (camera.read(image)) {
-                // Échantillonnage des images selon le taux spécifié
-                if (compteurImages % tauxEchantillonnage == 0) {
-                    // Détecter les panneaux dans l'image
-                    Vector<Mat> resultatsDetection = TraitementImage.DetectSign(cheminVideo);
-                    
-                    // Si des panneaux sont détectés (en excluant l'image originale)
-                    if (resultatsDetection.size() > 1) {
-                        // Ajouter les panneaux détectés (à partir du 2ème élément)
-                        for (int i = 1; i < resultatsDetection.size(); i++) {
-                            panneauxDetectes.add(resultatsDetection.get(i));
-                        }
-                    }
-                }
-                
-                compteurImages++;
-            }
-        } finally {
-            // Libération des ressources de la capture vidéo
-            camera.release();
-        }
-        
-        return panneauxDetectes;
-    }
-    
     public static Mat DetectSignV3(Mat image) {
         // panneaux de reference
         File dossierRef = new File("ref");
@@ -558,17 +503,37 @@ public class TraitementImage {
         // detect Red circles
         Vector<Mat> imgs = surroundCircles(image, 0, 10, 160, 180);
 
+        int a = 0;
         for (int i = 0; i < imgs.size(); i++) {
-            int a = matchingtrafficSign(imgs.get(i));
+            a = matchingtrafficSign(imgs.get(i));
             results.add(readFile(listeRef[a]).clone());
         }
         
-        Mat resultat = surroundCirclesinImage(image, 0, 10, 160, 180);
+        Mat resultat = surroundCirclesinImage(image, listeRef[a].getName(), 0, 10, 160, 180);
 
         return resultat;
     }
     
-    public static Mat surroundCirclesinImage(Mat img, int lower_bound1, int higher_bound1, int lower_bound2, int higher_bound2) {
+    public static Vector<Mat> DetectSignV4(Mat image) {
+        // panneaux de reference
+        File dossierRef = new File("ref");
+        File[] listeRef = dossierRef.listFiles();
+
+        Vector<Mat> results = new Vector<Mat>();
+
+        results.add(image.clone());
+        // detect Red circles
+        Vector<Mat> imgs = surroundCircles(image, 0, 10, 160, 180);
+
+        for (int i = 0; i < imgs.size(); i++) {
+            int b = matchingtrafficSignV2(imgs.get(i));
+            results.add(readFile(listeRef[b]).clone());
+        }
+
+        return results;
+    }
+    
+    public static Mat surroundCirclesinImage(Mat img, String text, int lower_bound1, int higher_bound1, int lower_bound2, int higher_bound2) {
         Mat threshold_img = thresholdingMultipleColors(img, lower_bound1, higher_bound1, lower_bound2, higher_bound2);
 
         List<MatOfPoint> contours = extractContoursPoints(threshold_img);
@@ -585,14 +550,26 @@ public class TraitementImage {
 
             if ((contourArea / (Math.PI * radius[0] * radius[0])) >= 0.8) {
                 Core.circle(img, center, (int) radius[0], new Scalar(0, 255, 0), 2);
+                Point textPosition = new Point(center.x - 20, center.y - radius[0] - 10);
+
+                Core.putText(
+                    img,
+                    text,
+                    textPosition,
+                    Core.FONT_HERSHEY_SIMPLEX,
+                    0.9,
+                    new Scalar(0, 0, 255), 
+                    2
+                );
             }
         }
+        
         return img;
     }
 
 	public static Vector<Mat> videoTreatment(String videoPath, int sampleRate) {
 	    // Vecteur pour stocker les panneaux détectés
-	    Vector<Mat> treatedImages = new Vector<>();
+	    Vector<Mat> treatedImages = new Vector<Mat>();
 	    
 	    File videoFile = new File(videoPath);
 	    if (!videoFile.exists()) {
@@ -609,6 +586,10 @@ public class TraitementImage {
 	        return treatedImages;
 	    }
 	    
+	    double totalFrames = camera.get(7);
+        double fps = camera.get(5);
+        double durationInSeconds = totalFrames / fps;
+	    
 	    // Matrice pour stocker chaque image
 	    Mat image = new Mat();
 	    int imagesCounter = 0;
@@ -616,15 +597,21 @@ public class TraitementImage {
 	    try {
 	        // Lecture de chaque image de la vidéo
 	        while (camera.read(image)) {
+	        	if (image.empty()) {
+                    break;  // Si une image est vide (erreur de lecture)
+                }
+	        	
 	            // Échantillonnage des images selon le taux spécifié
-	            if (imagesCounter % sampleRate == 0) {
+	            if (imagesCounter % ((int)(fps)/sampleRate) == 0) {
 	                // Détecter les panneaux dans l'image
 	                Mat detectionResult = DetectSignV3(image);
-	                
-	            	// Ajouter les images traitées au vecteur de résultats
-	                treatedImages.add(detectionResult);
-	                System.out.println(detectionResult.cols());
-	                System.out.println(detectionResult.rows());
+
+	                // Ajouter les images traitées au vecteur de résultats
+	                if (detectionResult.empty() || detectionResult.cols() == 0 || detectionResult.rows() == 0) {
+	                    System.err.println("L'image est vide ou avec des dimensions invalides.");
+	                } else {
+	                    treatedImages.add(detectionResult.clone());
+	                }
 	            }
 	            
 	            imagesCounter++;
@@ -634,7 +621,6 @@ public class TraitementImage {
 	        camera.release();
 	    }
 	    
-	    System.out.println(treatedImages.size());
 	    return treatedImages;
 	}
 }
