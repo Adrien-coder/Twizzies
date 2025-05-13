@@ -95,7 +95,6 @@ public class Button {
                 impanel.removeAll();
                 impanel.repaint();
                 showImageVector(f, imgs, impanel);
-
             }
         });
 
@@ -119,30 +118,35 @@ public class Button {
     }
 
     public static void showImage(Frame f, Mat img, JPanel panel) {
-    	if(img.cols()>0 && img.rows()>0) {
-    		Size sz = new Size(300, 300);
-
-            Mat imageResized = new Mat();
-            Imgproc.resize(img, imageResized, sz);
-    		//Mat imageResized = img;
-    		
-            MatOfByte matOfByte = new MatOfByte();
-            Highgui.imencode(".png", imageResized, matOfByte);
-            byte[] byteArray = matOfByte.toArray();
-            BufferedImage bufImage = null;
+        if (img != null && !img.empty() && img.cols() > 0 && img.rows() > 0) {
             try {
+                Size sz = new Size(300, 300);
+                Mat imageResized = new Mat();
+                Imgproc.resize(img, imageResized, sz);
+                
+                MatOfByte matOfByte = new MatOfByte();
+                Highgui.imencode(".png", imageResized, matOfByte);
+                byte[] byteArray = matOfByte.toArray();
+                
                 InputStream in = new ByteArrayInputStream(byteArray);
-                bufImage = ImageIO.read(in);
-                // BufferedImage img = ImageIO.read(new File(fichierImage));
+                BufferedImage bufImage = ImageIO.read(in);
+                
                 JLabel pic = new JLabel(new ImageIcon(bufImage));
+                //panel.removeAll();
                 panel.add(pic);
-                f.add(panel);
-                // recharger la frame pour faire apparaitre l'image
+                panel.revalidate();
+                panel.repaint();
+                
+                f.getContentPane().add(panel);
+                f.pack();
                 f.setVisible(true);
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
-    	}
+        } else {
+            System.err.println("Image vide ou invalide.");
+        }
     }
 
     public static void showImageVector(Frame f, Vector<Mat> imgs, JPanel panel) {
@@ -150,5 +154,36 @@ public class Button {
             showImage(f, imgs.get(i), panel);
         }
     }
+    
+    public static void showImagefromVideo(Frame f, Mat img, JPanel panel) {
+        if (img != null && !img.empty() && img.cols() > 0 && img.rows() > 0) {
+            try {
+                Size sz = new Size(960, 540);
+                Mat imageResized = new Mat();
+                Imgproc.resize(img, imageResized, sz);
+                
+                MatOfByte matOfByte = new MatOfByte();
+                Highgui.imencode(".png", imageResized, matOfByte);
+                byte[] byteArray = matOfByte.toArray();
+                
+                InputStream in = new ByteArrayInputStream(byteArray);
+                BufferedImage bufImage = ImageIO.read(in);
+                
+                JLabel pic = new JLabel(new ImageIcon(bufImage));
+                panel.removeAll();
+                panel.add(pic);
+                panel.revalidate();
+                panel.repaint();
+                
+                f.getContentPane().add(panel);
+                f.pack();
+                f.setVisible(true);
 
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.err.println("Image vide ou invalide.");
+        }
+    }
 }

@@ -62,9 +62,8 @@ public class Frame extends JFrame {
             panneauxDetecteV2 = TraitementImage.DetectSignV2(image);
             BouttonRefresh();
         } else if (type.equals("avi") || type.equals("mkv") || type.equals("mp4")) {
-            Vector<Mat> video = TraitementImage.videoTreatment(image, (int)(1000.0/30));
+            Vector<Mat> video = TraitementImage.videoTreatment(image, 5);   
             genererVideo(video);
-
         }
 
     }
@@ -100,17 +99,18 @@ public class Frame extends JFrame {
     }
 
     public void genererVideo(Vector<Mat> images) {
-        for (int i = 0; i < images.size(); i++) {
-            Button.showImage(this, images.get(i), panel);
-            try {
-                Thread.sleep((int)(1000.0/30));
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+        new Thread(() -> {
+            for (int i = 0; i < images.size(); i++) {
+                Button.showImagefromVideo(this, images.get(i), panel);
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
             }
-        }
-
+        }).start();
     }
-
+    
     public void setImage(String img) {
         this.image = img;
         preparationImage();
